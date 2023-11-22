@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
-            # id-token: write # from NPM's example
+            id-token: write # from NPM's example
             # packages: write # from GitHub's example
         steps:
             - uses: actions/checkout@v4
