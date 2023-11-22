@@ -8,5 +8,8 @@
             "name": "demo",
             "path": "../demo"
         }
-    ]
+    ],
+    "settings": {
+        "svelte.enable-ts-plugin": true
+    }
 }
