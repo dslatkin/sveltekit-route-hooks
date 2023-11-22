@@ -1,7 +1,3 @@
-# https://docs.npmjs.com/generating-provenance-statements#example-github-actions-workflow
-# https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#example-workflow
-# https://docs.github.com/en/webhooks/webhook-events-and-payloads#release
-
 name: Publish package
 on:
     release:
@@ -11,20 +7,15 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
-            id-token: write # from NPM's example
-            # packages: write # from GitHub's example
+            id-token: write
         steps:
             - uses: actions/checkout@v4
             - uses: actions/setup-node@v4
               with:
                   node-version: '20.x'
                   registry-url: 'https://registry.npmjs.org'
-            # - run: npm install -g npm
             - run: npm ci
             - run: npm run package
             - run: npm publish --provenance
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-            # - run: npm publish --provenance --access public
-            #   env:
-            #       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
