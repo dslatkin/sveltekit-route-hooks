@@ -1,5 +1,16 @@
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
+import { registerHandler } from 'sveltekit-route-hooks';
 import { Game } from './game';
+
+registerHandler(async ({event, resolve}) => {
+	console.log('Before route guard');
+	if (Math.random() < 0.25) {
+		throw error(403, { message: 'You are not authorized' });
+	}
+	const response = await resolve(event);
+	console.log('After route guard');
+	return response
+});
 
 /** @satisfies {import('./$types').PageServerLoad} */
 export const load = ({ cookies }) => {
