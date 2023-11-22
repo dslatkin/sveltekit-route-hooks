@@ -31,12 +31,12 @@ export const registerHandler = (handler) => {
     if (DEV) {
         source = callSite.getEvalOrigin(); // e.g. /workspaces/<project-name>/src/routes/sverdle/+page.server.js
         regex = new RegExp(
-            `^${cwd}/${routesDir}/([a-z+./]+)/\\+page\\.server\\.(js|ts)$`,
+            `^${cwd}/${routesDir}/([a-z+./-]+)/\\+page\\.server\\.(js|ts)$`,
         );
     } else {
         source = callSite.getFileName(); // e.g. file:///workspaces/<project-name>/.svelte-kit/output/server/entries/pages/sverdle/_page.server.js
         regex = new RegExp(
-            `^file://${cwd}/${outDir}/output/server/entries/pages/([a-z+./]+)/_page\\.server\\.js$`,
+            `^file://${cwd}/${outDir}/output/server/entries/pages/([a-z+./-]+)/_page\\.server\\.js$`,
         );
     }
     if (!source) {
