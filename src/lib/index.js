@@ -17,6 +17,40 @@ const outDir = svelteConfig?.kit?.outDir || '.svelte-kit';
 const routeHandlers = new Map();
 
 /**
+ * @param {string} sourceFile
+ */
+const getRouteInDev = (sourceFile) => {
+    const regex = new RegExp(
+        `^${cwd}/${routesDir}/([a-z\\[\\]/+.-]+)/\\+page\\.server\\.(js|ts)$`,
+    );
+    const regexResult = regex.exec(sourceFile);
+    if (!regexResult || regexResult.length < 2) {
+        throw new Error(
+            `Invalid route ${sourceFile}\n${JSON.stringify(
+                {
+                    DEV,
+                    cwd,
+                    routesDir,
+                    outDir,
+                },
+                null,
+                2,
+            )}}`,
+        );
+    }
+
+    return `/${regexResult[1]}`;
+};
+
+/**
+ * @param {string} sourceFile
+ */
+const getRouteInBuild = (sourceFile) => {
+    console.log(`todo: implement getRouteInBuild for ${sourceFile}`);
+    return `/fake-route`;
+};
+
+/**
  * Register a route handler.
  *
  * @param {import('@sveltejs/kit').Handle} handler
@@ -24,38 +58,11 @@ const routeHandlers = new Map();
 export const registerHandler = (handler) => {
     const callSite = callsites()[1];
 
-    /** @type string | undefined | null */
-    let source;
-    /** @type RegExp */
-    let regex;
-    if (DEV) {
-        source = callSite.getEvalOrigin(); // e.g. /workspaces/<project-name>/src/routes/sverdle/+page.server.js
-        regex = new RegExp(
-            `^${cwd}/${routesDir}/([a-z+./-]+)/\\+page\\.server\\.(js|ts)$`,
-        );
-    } else {
-        source = callSite.getFileName(); // e.g. file:///workspaces/<project-name>/.svelte-kit/output/server/entries/pages/sverdle/_page.server.js
-        regex = new RegExp(
-            `^file://${cwd}/${outDir}/output/server/entries/pages/([a-z+./-]+)/_page\\.server\\.js$`,
-        );
-    }
-    if (!source) {
-        throw new Error('Could not get source file for route');
-    }
+    let route = DEV
+        ? getRouteInDev(callSite.getEvalOrigin())
+        : getRouteInBuild(callSite.getFileName());
 
-    const regexResult = regex.exec(source);
-    if (!regexResult || regexResult.length < 2) {
-        throw new Error(
-            `Invalid route ${source} ${JSON.stringify({
-                DEV,
-                cwd,
-                routesDir,
-                outDir,
-            })}}`,
-        );
-    }
-
-    routeHandlers.set(`/${regexResult[1]}`, handler);
+    routeHandlers.set(route, handler);
 };
 
 /**
