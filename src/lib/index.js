@@ -5,7 +5,7 @@ import { DEV } from 'esm-env';
 const cwd = process.cwd(); // e.g. /workspaces/<project-name>
 
 /** @type {import('@sveltejs/kit').Config} */
-const svelteConfig = import(/* @vite-ignore */ `${cwd}/svelte.config.js`);
+const svelteConfig = await import(/* @vite-ignore */ `${cwd}/svelte.config.js`);
 
 /** @type string */
 const routesDir = svelteConfig?.kit?.files?.routes || 'src/routes';
