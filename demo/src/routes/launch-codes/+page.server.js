@@ -1,9 +1,9 @@
 import { registerHandler } from 'sveltekit-route-hooks';
 
 registerHandler(async ({event, resolve}) => {
-	console.log('Before outer page guard');
+	console.log('Before /launch-codes/+page.server.js');
 	const response = await resolve(event);
-	console.log('After outer page guard');
+	console.log('After /launch-codes/+page.server.js');
 	return response
 });
 
