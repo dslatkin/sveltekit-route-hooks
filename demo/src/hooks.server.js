@@ -6,6 +6,7 @@ let requestCount = 0;
 /** @type {import('@sveltejs/kit').Handle} */
 export async function first({ event, resolve }) {
     console.log(`\nRequest #${++requestCount}`);
+    console.log(`Route ID: ${event.route.id}`);
 
     console.log('Before first');
     const response = await resolve(event);

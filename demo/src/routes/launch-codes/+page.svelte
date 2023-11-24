@@ -7,6 +7,6 @@
 
 <ul>
 	{#each data.launch_codes as code}
-		<li>{code}</li>
+		<li><a href="/launch-codes/{code}">{code}</a></li>
 	{/each}
 </ul>
