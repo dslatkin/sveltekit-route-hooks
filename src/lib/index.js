@@ -19,7 +19,7 @@ const routesDir = svelteConfig?.kit?.files?.routes || 'src/routes';
 /** @type {string} */
 const outDir = svelteConfig?.kit?.outDir || '.svelte-kit';
 
-/**  @type {import('vite').Manifest} | undefined */
+/**  @type {import('vite').Manifest | undefined} */
 let viteManifest;
 if (!DEV) {
     const manifestFile = `${cwd}/${outDir}/output/server/.vite/manifest.json`;
