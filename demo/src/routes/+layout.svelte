@@ -3,6 +3,7 @@
 </script>
 
 <header>
+	<h1>sveltekit-route-hooks demo</h1>
 	<nav>
 		<ul>
 			<li>
