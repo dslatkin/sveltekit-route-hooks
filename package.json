@@ -1,6 +1,6 @@
 {
     "name": "sveltekit-route-hooks",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "license": "MIT",
     "description": "Scope your SvelteKit hooks to specific routes.",
     "maintainers": [
