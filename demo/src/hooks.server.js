@@ -5,12 +5,11 @@ let requestCount = 0;
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function first({ event, resolve }) {
-    console.log(`\nRequest #${++requestCount}`);
-    console.log(`Route ID: ${event.route.id}`);
+    console.log(`🌎 Request #${++requestCount}: ${event.route.id}`);
 
-    console.log('Before first');
+    console.log('Before first handler');
     const response = await resolve(event);
-    console.log('After first');
+    console.log('After first handler');
 	return response;
 }
 
