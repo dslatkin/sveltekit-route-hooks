@@ -1,6 +1,10 @@
 import callsites from 'callsites';
-import { DEV } from 'esm-env';
+import { BROWSER, DEV } from 'esm-env';
 import fs from 'node:fs';
+
+if (BROWSER) {
+    throw new Error('SvelteKit route hooks cannot be used in the browser.');
+}
 
 /** @type {string} */
 const cwd = process.cwd(); // e.g. /workspaces/<project-name>
