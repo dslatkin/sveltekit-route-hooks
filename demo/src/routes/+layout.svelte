@@ -14,6 +14,14 @@
 			<li>
 				<a href="/client-only">Client-Only Hooks</a>
 			</li>
+			<li>
+				Browse fruits
+				<ul>
+					<li><a href="/apples">Apples</a></li>
+					<li><a href="/bananas">Bananas</a></li>
+					<li><a href="/cherries">Cherries</a></li>
+				</ul>
+			</li>
 		</ul>
 	</nav>
 </header>
