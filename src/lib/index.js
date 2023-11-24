@@ -26,6 +26,11 @@ if (!DEV) {
 }
 
 /** @type {Map<string, import('@sveltejs/kit').Handle>} */
+const layoutHandlers = new Map();
+
+/** @type {Map<string, import('@sveltejs/kit').Handle>} */
+const pageHandlers = new Map();
+
 const routeHandlers = new Map();
 
 /**
@@ -87,13 +92,25 @@ const getSourceFile = () => {
  * @param {import('@sveltejs/kit').Handle} handler
  */
 export const registerHandler = (handler) => {
-    handler; // todo: remove noop preventing unused var warning
+    const sourceFile = getSourceFile();
 
-    const viteSourceFile = getSourceFile();
+    const regexResult = /(.*)\/\+(layout|page)\.server\.(js|ts)$/.exec(
+        sourceFile,
+    );
+    if (!regexResult || regexResult.length < 4) {
+        throw new Error(`Unexpected source file path ${sourceFile}`);
+    }
 
-    console.log(`🚀 ${viteSourceFile}`);
+    const [, routeId, type] = regexResult;
+    if (type === 'layout') {
+        layoutHandlers.set(routeId, handler);
+    } else if (type === 'page') {
+        pageHandlers.set(routeId, handler);
+    } else {
+        throw new Error(`Unexpected source file path ${sourceFile}`);
+    }
 
-    // routeHandlers.set(route, handler);
+    console.log(`🤖 Registered ${type} hook: ${routeId}`);
 };
 
 /**
