@@ -1,3 +1,4 @@
+import { sequence } from '@sveltejs/kit/hooks';
 import callsites from 'callsites';
 import { BROWSER, DEV } from 'esm-env';
 import fs from 'node:fs';
@@ -31,7 +32,8 @@ const layoutHandlers = new Map();
 /** @type {Map<string, import('@sveltejs/kit').Handle>} */
 const pageHandlers = new Map();
 
-const routeHandlers = new Map();
+/** @type {Map<string, import('@sveltejs/kit').Handle[] | null} */
+const handlersByRoute = new Map();
 
 /**
  * Get the source path of the currently called file. This is different when run
@@ -124,11 +126,36 @@ export const routerMiddleware = async ({ event, resolve }) => {
         return await resolve(event);
     }
 
-    const routeHandler = routeHandlers.get(event.route.id);
-    if (routeHandler) {
-        const response = await routeHandler({ event, resolve });
-        return response;
+    let handlers = handlersByRoute.get(event.route.id);
+
+    if (handlers === undefined) {
+        // Haven't yet checked handlers for this route
+        handlers = [];
+        const routeParts = event.route.id.split('/');
+        while (routeParts.length) {
+            const routeId = routeParts.join('/') || '/';
+            const layoutHandler = layoutHandlers.get(routeId);
+            if (layoutHandler) {
+                console.log(`🤖 Caching layout handler: ${routeId}`);
+                handlers.push(layoutHandler);
+            }
+            const pageHandler = pageHandlers.get(routeId);
+            if (pageHandler) {
+                console.log(`🤖 Caching page handler: ${routeId}`);
+                handlers.push(pageHandler);
+            }
+            routeParts.pop();
+        }
+        handlers.reverse();
+        handlers = handlers.length ? handlers : null;
+        handlersByRoute.set(event.route.id, handlers);
     }
 
-    return await resolve(event);
+    if (handlers === null) {
+        // Handlers have been checked and none are registered
+        console.log('done');
+        return await resolve(event);
+    }
+
+    return await sequence(...handlers)({ event, resolve });
 };
