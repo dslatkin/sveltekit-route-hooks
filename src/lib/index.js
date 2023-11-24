@@ -1,5 +1,6 @@
 import callsites from 'callsites';
 import { DEV } from 'esm-env';
+import fs from 'node:fs';
 
 /** @type string */
 const cwd = process.cwd(); // e.g. /workspaces/<project-name>
@@ -13,41 +14,66 @@ const routesDir = svelteConfig?.kit?.files?.routes || 'src/routes';
 /** @type string */
 const outDir = svelteConfig?.kit?.outDir || '.svelte-kit';
 
+/**  @type Record<string, any> | undefined */
+let viteManifest;
+if (!DEV) {
+    const manifestFile = `${cwd}/${outDir}/output/server/.vite/manifest.json`;
+    viteManifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
+}
+
 /** @type Map<string, import('@sveltejs/kit').Handle> */
 const routeHandlers = new Map();
 
 /**
- * @param {string} sourceFile
+ * Get the source path of the currently called file. This is different when run
+ * in `dev` versus `build` mode.
+ *
+ * @returns {string} A path relative to the project root, for example
+ * `/launch-codes/[code]/+page.server.js`
  */
-const getRouteInDev = (sourceFile) => {
-    const regex = new RegExp(
-        `^${cwd}/${routesDir}/([a-z\\[\\]/+.-]+)/\\+page\\.server\\.(js|ts)$`,
-    );
-    const regexResult = regex.exec(sourceFile);
-    if (!regexResult || regexResult.length < 2) {
-        throw new Error(
-            `Invalid route ${sourceFile}\n${JSON.stringify(
-                {
-                    DEV,
-                    cwd,
-                    routesDir,
-                    outDir,
-                },
-                null,
-                2,
-            )}}`,
-        );
+const getSourceFile = () => {
+    const callSite = callsites()[2];
+
+    if (DEV) {
+        const prefix = `${cwd}/${routesDir}`;
+        const file = callSite.getEvalOrigin();
+        if (!file) {
+            throw new Error('Expected source file');
+        }
+        if (!file.startsWith(prefix)) {
+            throw new Error(`Unexpected source file path ${file}`);
+        }
+
+        return file.slice(prefix.length);
     }
 
-    return `/${regexResult[1]}`;
-};
+    const buildPrefix = `file://${cwd}/${outDir}/output/server/`;
+    const buildFile = callSite.getFileName();
+    if (!buildFile) {
+        throw new Error('Expected build source file');
+    }
+    if (!buildFile.startsWith(buildPrefix)) {
+        throw new Error(`Unexpected build source file path ${buildFile}`);
+    }
+    if (!viteManifest) {
+        throw new Error('Expected Vite manifest file');
+    }
 
-/**
- * @param {string} sourceFile
- */
-const getRouteInBuild = (sourceFile) => {
-    console.log(`todo: implement getRouteInBuild for ${sourceFile}`);
-    return `/fake-route`;
+    const shortBuildFile = buildFile.slice(buildPrefix.length);
+    const manifestChunk = Object.values(viteManifest).find(
+        ({ file }) => file == shortBuildFile,
+    );
+    if (!manifestChunk) {
+        throw new Error(`Could not find manifest chunk for ${shortBuildFile}`);
+    }
+
+    const prefix = routesDir;
+    const file = manifestChunk.src;
+    if (!file.startsWith(prefix)) {
+        throw new Error(`Unexpected source file path ${file}`);
+    }
+
+    return file.slice(prefix.length);
 };
 
 /**
@@ -56,13 +82,13 @@ const getRouteInBuild = (sourceFile) => {
  * @param {import('@sveltejs/kit').Handle} handler
  */
 export const registerHandler = (handler) => {
-    const callSite = callsites()[1];
+    handler; // todo: remove noop preventing unused var warning
 
-    let route = DEV
-        ? getRouteInDev(callSite.getEvalOrigin())
-        : getRouteInBuild(callSite.getFileName());
+    const viteSourceFile = getSourceFile();
 
-    routeHandlers.set(route, handler);
+    console.log(`🚀 ${viteSourceFile}`);
+
+    // routeHandlers.set(route, handler);
 };
 
 /**
