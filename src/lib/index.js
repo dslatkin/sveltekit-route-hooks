@@ -2,26 +2,26 @@ import callsites from 'callsites';
 import { DEV } from 'esm-env';
 import fs from 'node:fs';
 
-/** @type string */
+/** @type {string} */
 const cwd = process.cwd(); // e.g. /workspaces/<project-name>
 
 /** @type {import('@sveltejs/kit').Config} */
 const svelteConfig = await import(/* @vite-ignore */ `${cwd}/svelte.config.js`);
 
-/** @type string */
+/** @type {string} */
 const routesDir = svelteConfig?.kit?.files?.routes || 'src/routes';
 
-/** @type string */
+/** @type {string} */
 const outDir = svelteConfig?.kit?.outDir || '.svelte-kit';
 
-/**  @type Record<string, any> | undefined */
+/**  @type {import('vite').Manifest} | undefined */
 let viteManifest;
 if (!DEV) {
     const manifestFile = `${cwd}/${outDir}/output/server/.vite/manifest.json`;
     viteManifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
 }
 
-/** @type Map<string, import('@sveltejs/kit').Handle> */
+/** @type {Map<string, import('@sveltejs/kit').Handle>} */
 const routeHandlers = new Map();
 
 /**
@@ -32,6 +32,7 @@ const routeHandlers = new Map();
  * `/launch-codes/[code]/+page.server.js`
  */
 const getSourceFile = () => {
+    /** @type {import('callsites').CallSite} */
     const callSite = callsites()[2];
 
     if (DEV) {
