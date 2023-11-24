@@ -101,7 +101,8 @@ export const registerHandler = (handler) => {
         throw new Error(`Unexpected source file path ${sourceFile}`);
     }
 
-    const [, routeId, type] = regexResult;
+    const [, routeIdMatch, type] = regexResult;
+    const routeId = routeIdMatch || '/';
     if (type === 'layout') {
         layoutHandlers.set(routeId, handler);
     } else if (type === 'page') {
