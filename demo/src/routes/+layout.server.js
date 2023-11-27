@@ -1,8 +1,12 @@
-import { registerHandler } from 'sveltekit-route-hooks';
+import { handleRoute } from 'sveltekit-route-hooks';
 
-registerHandler(async ({event, resolve}) => {
-	console.log('Before /+layout.server.js');
-	const response = await resolve(event);
-	console.log('After /+layout.server.js');
-	return response
+let requestCount = 0;
+
+handleRoute(async function ({ event, resolve }) {
+    console.log(`🌎 Request #${++requestCount}: ${event.route.id}`);
+
+    console.log('Before /+layout.server.js');
+    const response = await resolve(event);
+    console.log('After /+layout.server.js');
+    return response;
 });

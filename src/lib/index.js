@@ -93,7 +93,7 @@ const getSourceFile = () => {
  *
  * @param {import('@sveltejs/kit').Handle} handler
  */
-export const registerHandler = (handler) => {
+export const handleRoute = (handler) => {
     const sourceFile = getSourceFile();
 
     const regexResult = /(.*)\/\+(layout|page)\.server\.(js|ts)$/.exec(
@@ -121,7 +121,7 @@ export const registerHandler = (handler) => {
  *
  * @type {import('@sveltejs/kit').Handle}
  */
-export const routerMiddleware = async ({ event, resolve }) => {
+export const handle = async ({ event, resolve }) => {
     if (!event.route.id) {
         return await resolve(event);
     }
