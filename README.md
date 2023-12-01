@@ -1,21 +1,12 @@
-> [!NOTE]  
-> Highlights information that users should take into account, even when skimming.
-
-> [!TIP]
-> Optional information to help a user be more successful.
-
-> [!IMPORTANT]  
-> Crucial information necessary for users to succeed.
-
-> [!WARNING]  
-> Critical content demanding immediate user attention due to potential risks.
-
-> [!CAUTION]
-> Negative potential consequences of an action.
-
 <p align="center">
 <img src=".github/logo.svg" height="300" alt="SvelteKit Route Hooks">
 </p>
+
+> [!WARNING]  
+> It's not recommended to use this library in production, this was an
+> experiment to see if it was possible to create route-scoped hooks in
+> SvelteKit. It is, but it's not pretty and depends on adapter-specific
+> implementation.
 
 This library makes it easy to create hooks that are scoped to specific routes
 right where you expect them: in your routing tree. No more need for string
